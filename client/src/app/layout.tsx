@@ -4,6 +4,7 @@ import { Inter, Lora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/shared/footer";
+import Navbar from "@/components/shared/navbar";
 
 // Inter'ni asosiy matn uchun, --font-inter o'zgaruvchisi bilan
 const inter = Inter({
@@ -40,6 +41,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="relative flex flex-col min-h-screen overflow-hidden">
+            <Navbar />
             <main className="flex-grow">{children}</main>
             <Footer />
           </div>
