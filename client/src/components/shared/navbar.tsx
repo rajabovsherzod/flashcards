@@ -18,43 +18,6 @@ const Navbar = () => {
             </span>
           </span>
         </Link>
-        <div
-          className="lg:flex flex-row flex-1 items-center justify-center space-x-2 text-sm"
-          style={{ justifyContent: "center", transform: "none" }}
-        >
-          <div className="relative">
-            <Link
-              className="text-foreground/90 relative px-3 py-1.5 transition-colors"
-              href="/#home"
-            >
-              <span className="relative z-10">Home</span>
-            </Link>
-          </div>
-          <div className="relative">
-            <Link
-              className="text-foreground/90 relative px-3 py-1.5 transition-colors"
-              href="/#product"
-            >
-              <span className="relative z-10">Product</span>
-            </Link>
-          </div>
-          <div className="relative">
-            <Link
-              className="text-foreground/90 relative px-3 py-1.5 transition-colors"
-              href="/#pricing"
-            >
-              <span className="relative z-10">Pricing</span>
-            </Link>
-          </div>
-          <div className="relative">
-            <Link
-              className="text-foreground/90 relative px-3 py-1.5 transition-colors"
-              href="/blog"
-            >
-              <span className="relative z-10">Blog</span>
-            </Link>
-          </div>
-        </div>
         <div>
           <div className="flex items-center gap-2">
             <Link

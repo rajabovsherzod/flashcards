@@ -1,8 +1,16 @@
 "use client";
 
-import { Check, Rows, Settings, Sigma, Volume2, X } from "lucide-react";
+import {
+  ThumbsUp,
+  ThumbsDown,
+  Rows,
+  Settings,
+  Sigma,
+  Volume2,
+} from "lucide-react";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 const FlashcardUIMockup = () => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -30,7 +38,7 @@ const FlashcardUIMockup = () => {
   return (
     <div className="w-full h-full bg-background text-foreground flex flex-col p-2 select-none">
       {/* Header */}
-      <div className="flex justify-between items-center p-3 pt-5 border-b border-border">
+      <div className="flex justify-between items-center p-4 pt-8 border-b border-border">
         <h1 className="font-bold text-base">
           FlashCard
           <span className="ml-1 bg-gradient-to-r from-primary to-teal-400 bg-clip-text text-transparent">
@@ -97,18 +105,21 @@ const FlashcardUIMockup = () => {
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.2 }}
             >
-              <div
+              <Button
+                variant="destructive"
                 onClick={handleRatingClick}
-                className="cursor-pointer bg-red-500/10 text-red-500 h-12 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold"
+                className="h-12"
+                aria-label="I don't know"
               >
-                <X className="w-5 h-5" /> Bilmayman
-              </div>
-              <div
+                <ThumbsDown className="w-6 h-6" />
+              </Button>
+              <Button
                 onClick={handleRatingClick}
-                className="cursor-pointer bg-green-500/10 text-green-500 h-12 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold"
+                className="h-12"
+                aria-label="I know"
               >
-                <Check className="w-5 h-5" /> Bilaman
-              </div>
+                <ThumbsUp className="w-6 h-6" />
+              </Button>
             </motion.div>
           )}
         </AnimatePresence>
