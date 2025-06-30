@@ -24,7 +24,7 @@ const HeroSection = () => {
             >
               Where Your {/* */}{" "}
               <span className="bg-gradient-to-b from-primary to-primary/80 bg-clip-text text-transparent">
-                Dreams
+                Dreams 
               </span>
             </h2>
             <h2
