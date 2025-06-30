@@ -11,8 +11,9 @@ import {
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import StatsUIMockup from "./stats-ui-mockup";
 
-const FlashcardUIMockup = () => {
+const FlashcardView = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showRatingButtons, setShowRatingButtons] = useState(false);
 
@@ -36,29 +37,23 @@ const FlashcardUIMockup = () => {
   };
 
   return (
-    <div className="w-full h-full bg-background text-foreground flex flex-col p-2 select-none">
-      {/* Header */}
-      <div className="flex justify-between items-center p-4 pt-8 border-b border-border">
-        <h1 className="font-bold text-base">
-          FlashCard
-          <span className="ml-1 bg-gradient-to-r from-primary to-teal-400 bg-clip-text text-transparent">
-            Pro
-          </span>
-        </h1>
-        <Settings className="w-4 h-4 text-muted-foreground" />
-      </div>
-
-      {/* Progress Bar */}
-      <div className="px-4 pt-4">
-        <div className="w-full bg-muted rounded-full h-1.5">
-          <div
-            className="bg-primary h-1.5 rounded-full"
-            style={{ width: "45%" }}
-          ></div>
-        </div>
-        <p className="text-xs text-muted-foreground text-center mt-1">
-          15/32 cards reviewed
+    <>
+      {/* Deck Title & Progress Bar */}
+      <div className="px-4 pt-4 space-y-2">
+        <p className="text-base font-medium text-center text-muted-foreground">
+          English Vocabulary
         </p>
+        <div>
+          <div className="w-full bg-muted rounded-full h-1.5">
+            <div
+              className="bg-primary h-1.5 rounded-full"
+              style={{ width: "45%" }}
+            ></div>
+          </div>
+          <p className="text-xs text-muted-foreground text-center mt-1">
+            15/32 cards reviewed
+          </p>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -124,17 +119,68 @@ const FlashcardUIMockup = () => {
           )}
         </AnimatePresence>
       </div>
+    </>
+  );
+};
+
+const FlashcardUIMockup = () => {
+  const [activeView, setActiveView] = useState("decks");
+
+  const views: { [key: string]: React.ReactNode } = {
+    decks: <FlashcardView />,
+    study: <StatsUIMockup />,
+  };
+
+  return (
+    <div className="w-full h-full bg-background text-foreground flex flex-col p-2 select-none">
+      {/* Header */}
+      <div className="flex justify-between items-center p-4 pt-8 border-b border-border">
+        <h1 className="font-bold text-base">
+          FlashCard
+          <span className="ml-1 bg-gradient-to-r from-primary to-teal-400 bg-clip-text text-transparent">
+            Pro
+          </span>
+        </h1>
+        <Settings className="w-4 h-4 text-muted-foreground" />
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeView}
+          className="flex-grow flex flex-col"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {views[activeView]}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Footer Navigation */}
       <div className="flex justify-around items-center py-2 border-t border-border">
-        <div className="flex flex-col items-center gap-1 text-primary">
+        <button
+          onClick={() => setActiveView("decks")}
+          className={`flex flex-col items-center gap-1 transition-colors ${
+            activeView === "decks"
+              ? "text-primary"
+              : "text-muted-foreground hover:text-primary/80"
+          }`}
+        >
           <Rows className="w-5 h-5" />
           <span className="text-xs font-bold">Decks</span>
-        </div>
-        <div className="flex flex-col items-center gap-1 text-muted-foreground">
+        </button>
+        <button
+          onClick={() => setActiveView("study")}
+          className={`flex flex-col items-center gap-1 transition-colors ${
+            activeView === "study"
+              ? "text-primary"
+              : "text-muted-foreground hover:text-primary/80"
+          }`}
+        >
           <Sigma className="w-5 h-5" />
           <span className="text-xs">Study</span>
-        </div>
+        </button>
       </div>
     </div>
   );
