@@ -20,6 +20,18 @@ class CardController {
         }
     }
 
+    public createBatchCards = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { deckId } = req.params
+            const { cards } = req.body
+            const userId = req.user!.id
+            const batchCards = await this.cardService.createBatchCards(deckId, userId, cards)
+            res.status(201).json(new ApiResponse(batchCards, "Cards created successfully"))
+        } catch (error) {
+          next(error)  
+        }
+    }
+
     public getCards = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { deckId } = req.params

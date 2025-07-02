@@ -19,7 +19,9 @@ class AuthController {
 
   public registerStepTwo = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("🔴 Backend kelgan ma'lumotlar:", req.body);
       const { email, verificationCode } = req.body;
+      console.log("🔴 Backend destructure qilingan:", { email, verificationCode });
       const data = await this.authService.registerStepTwo({
         email,
         verificationCode,
@@ -60,7 +62,7 @@ class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         sameSite: "strict",
       });
-      res.status(200).json(new ApiResponse({ user, accessToken: tokens.accessToken }, "Login successful"));
+      res.status(200).json(new ApiResponse({ ...user, accessToken: tokens.accessToken }, "Login successful"));
     } catch (error) {
       next(error)
     }

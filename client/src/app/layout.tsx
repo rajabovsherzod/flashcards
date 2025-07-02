@@ -5,6 +5,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/shared/footer";
 import Navbar from "@/components/shared/navbar";
+import { QueryProvider } from "@/components/providers/query-provider";
+import { Toaster } from "@/components/ui/sonner"
 
 // Inter'ni asosiy matn uchun, --font-inter o'zgaruvchisi bilan
 const inter = Inter({
@@ -34,18 +36,21 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="bg-background">
       {/* Ikkala shrift o'zgaruvchisini ham body'ga beramiz */}
       <body className={`${inter.variable} ${lora.variable} font-sans`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="relative flex flex-col min-h-screen overflow-hidden">
-            <Navbar />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-          </div>
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="relative flex flex-col min-h-screen overflow-hidden">
+              <Navbar />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </div>
+          </ThemeProvider>
+        </QueryProvider>
+        <Toaster />
       </body>
     </html>
   );

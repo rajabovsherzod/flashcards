@@ -17,7 +17,6 @@ class Deckservice {
                 title: data.title,
                 quizType: data.quizType,
                 learningMode: data.learningMode,
-                isRandomOrder: data.isRandomOrder,
                 userId: userId,
             },
             include: {

@@ -4,7 +4,6 @@ export interface ICreateDeck {
     title: string;
     quizType?: QuizType;
     learningMode?: LearningMode;
-    isRandomOrder?: boolean;
 }
 
 export interface IUpdateCheck {

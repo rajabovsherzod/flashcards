@@ -10,9 +10,9 @@ class DeckController {
 
     public createDeck = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const {title, quizType, learningMode, isRandomOrder} = req.body;
+            const {title, quizType, learningMode} = req.body;
             const userId = req.user!.id;
-            const deck = await this.deckService.createDeck({title, quizType, learningMode, isRandomOrder}, userId);
+            const deck = await this.deckService.createDeck({title, quizType, learningMode}, userId);
             res.status(201).json(new ApiResponse(deck, "Deck created successfully"));
         } catch (error) {
             next(error)

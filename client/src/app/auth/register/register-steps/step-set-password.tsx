@@ -4,10 +4,15 @@ import * as z from "zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LockKeyhole } from "lucide-react";
+import { Eye, EyeOff, Loader2, LockKeyhole } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import { useRegisterModal } from "@/hooks/use-register-modal";
 import { registerStepThreeSchema } from "../../validation/index";
+import { registerStepThree } from "@/lib/api/auth/auth";
+import { useAuthStore } from "@/store/auth-store";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -25,17 +30,41 @@ export const Step3Password = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { onClose } = useRegisterModal();
-
+  const { email, setUserData } = useAuthStore();
+  const router = useRouter();
   const form = useForm<Step3Values>({
     resolver: zodResolver(registerStepThreeSchema),
     defaultValues: { password: "", confirmPassword: "" },
     mode: "onChange",
   });
 
+  const { mutate: registerStepThreeMutate, isPending } = useMutation({
+    mutationKey: ["register-step-three"],
+    mutationFn: registerStepThree,
+    onSuccess: (data) => {
+      localStorage.setItem("accessToken", data.data.accessToken);
+      setUserData({
+        fullName: data.data.fullName || "",
+        email: data.data.email || email,
+      });
+
+      toast.success("Account created successfully");
+      setTimeout(() => {
+        router.replace("/dashboard");
+      }, 0);
+      onClose();
+    },
+    onError: (error) => {
+      toast.error("Failed to create account", { description: error.message });
+    },
+  });
+
   const onSubmit = (values: Step3Values) => {
-    // Backendga ulashda bu yerga useMutation logikasi keladi
-    console.log("Final data to be sent:", values);
-    onClose(); // Jarayon tugagach modalni yopish
+    registerStepThreeMutate({
+      email,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+    });
   };
 
   return (
@@ -115,8 +144,16 @@ export const Step3Password = () => {
           )}
         />
 
-        <Button type="submit" className="w-full h-12 text-base">
-          Create Account
+        <Button
+          type="submit"
+          className="w-full h-12 text-base"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <Loader2 className="h-6 w-6 animate-spin" />
+          ) : (
+            "Create Account"
+          )}
         </Button>
       </form>
     </Form>

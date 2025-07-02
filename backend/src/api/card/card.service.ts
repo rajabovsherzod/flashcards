@@ -4,7 +4,7 @@ import { ICreateCard, IUpdateCard } from "./card.types"
 import DeckService from "../deck/deck.service"
 import { Card, Deck } from "@generated/prisma"
 import { CardDto } from "./card.dto"
-
+import { ICreateBatchCards } from "./card.validation"
 class CardService {
     constructor(private readonly deckService: DeckService){
         this.deckService = deckService
@@ -31,6 +31,21 @@ class CardService {
             }
         })
         return card
+    }
+
+    public async createBatchCards(deckId: string, userId: string, cards: ICreateBatchCards[]){
+        await this.deckService.checkDeckOwnership(deckId, userId)
+        const cardCreationPromises = cards.map(card => {
+            return prisma.card.create({
+                data: {
+                    front: card.front,
+                    back: card.back,
+                    deckId
+                }
+            })
+        })
+        const newCards = await prisma.$transaction(cardCreationPromises)
+        return newCards.map(card => new CardDto(card))
     }
 
     public async getCards(deckId: string, userId: string){

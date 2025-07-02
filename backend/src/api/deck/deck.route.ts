@@ -8,7 +8,7 @@ import CardController from "../card/card.controller";
 import CardService from "../card/card.service";
 import StudyController from "../study/study.controller";
 import StudyService from "../study/study.service";
-import { createCardSchema } from "../card/card.validation";
+import { createCardSchema, createBatchCardsSchema } from "../card/card.validation";
 
 
 const router = Router()
@@ -30,6 +30,7 @@ router.delete('/:deckId', authMiddleware, deckController.deleteDeck)
 
 
 router.post('/:deckId/cards', authMiddleware, validate(createCardSchema), cardController.createCard)
+router.post('/:deckId/cards/batch', authMiddleware, validate(createBatchCardsSchema), cardController.createBatchCards)
 router.get('/:deckId/cards', authMiddleware, cardController.getCards)
 
 router.get('/:deckId/study', authMiddleware, studyController.getStudyCards)

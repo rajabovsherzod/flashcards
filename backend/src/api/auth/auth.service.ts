@@ -62,11 +62,16 @@ class AuthService {
   }
 
   public async registerStepTwo(data: RegisterStepTwo) {
+    console.log("🟡 Service'ga kelgan ma'lumotlar:", data);
     const user = await prisma.user.findUnique({
       where: {
         email: data.email,
       },
     });
+
+    console.log("�� Database'dan topilgan user:", user);
+    console.log("🟡 Kelgan verificationCode:", data.verificationCode);
+    console.log("🟡 Database'dagi verificationCode:", user?.verificationCode);
 
     if (!user) {
       throw new ApiError(404, "User not found");
@@ -84,7 +89,7 @@ class AuthService {
       throw new ApiError(400,"Verification code has expired. Please try to register again.");
     }
 
-    if (user.verificationCode !== data.verificationCode) {
+    if (user.verificationCode.toString() !== data.verificationCode.toString()) {
       throw new ApiError(400, "Invalid verification code");
     }
 

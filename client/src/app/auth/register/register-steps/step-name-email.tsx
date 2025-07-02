@@ -4,14 +4,17 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, User, Loader2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 
 import { useRegisterModal } from "@/hooks/use-register-modal";
 import { useAuthStore } from "@/store/auth-store";
 import { registerStepOneSchema } from "../../validation/index";
+import { registerStepOne } from "@/lib/api/auth/auth";
 
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 type Step1Values = z.infer<typeof registerStepOneSchema>;
 
@@ -28,12 +31,22 @@ export const Step1Details = () => {
     mode: "onChange",
   });
 
-  const { isSubmitting } = form.formState;
+  const { mutate: registerStepOneMutate, isPending } = useMutation({
+    mutationKey: ["register-step-one"],
+    mutationFn: registerStepOne,
+    onSuccess: (data) => {
+      setFullName(data.data.fullName);
+      setEmail(data.data.email);
+      nextStep();
+    },
+    onError: () => {
+      toast.error("Failed to create account", { description: "This email is already in use" });
+    },
+  });
+
 
   const onSubmit = async (values: Step1Values) => {
-    setFullName(values.fullName);
-    setEmail(values.email);
-    nextStep();
+    registerStepOneMutate(values);
   };
 
   return (
@@ -52,7 +65,7 @@ export const Step1Details = () => {
                     placeholder="Full Name"
                     className="pl-10 h-12 text-base"
                     {...field}
-                    disabled={isSubmitting}
+                    disabled={isPending}
                   />
                 </FormControl>
               </div>
@@ -75,7 +88,7 @@ export const Step1Details = () => {
                     placeholder="Email Address"
                     className="pl-10 h-12 text-base"
                     {...field}
-                    disabled={isSubmitting}
+                    disabled={isPending}
                   />
                 </FormControl>
               </div>
@@ -84,8 +97,8 @@ export const Step1Details = () => {
           )}
         />
 
-        <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
-          {isSubmitting ? (
+        <Button type="submit" className="w-full h-12 text-base" disabled={isPending}>
+          {isPending ? (
             <Loader2 className="h-6 w-6 animate-spin" />
           ) : (
             "Send Verification Code"
