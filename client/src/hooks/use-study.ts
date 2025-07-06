@@ -4,6 +4,7 @@ import {
   reviewCard,
   GetStudyCardsParams,
 } from "@/lib/api/study/study";
+import { IReviewCard } from "@/lib/api/study/study.types";
 
 // O'rganish uchun kartochkalar ro'yxatini olish uchun hook
 export const useGetStudyCards = (
@@ -14,10 +15,10 @@ export const useGetStudyCards = (
     queryKey: ["study-cards", params.deckId, params.limit, params.randomOrder],
     queryFn: () => getStudyCards(params),
     enabled: enabled && !!params.deckId,
-    staleTime: 1000 * 60 * 10, // 10 daqiqa - o'rganish davomida yangilamaslik
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
+    staleTime: 0, // always fresh
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
     retry: 1,
   });
 };
@@ -25,12 +26,21 @@ export const useGetStudyCards = (
 export const useReviewCard = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: reviewCard,
-    onSuccess: () => {
-      // Faqat kerakli query'larni invalidate qilish
+    // mutationFn expects { cardId, payload, deckId }
+    mutationFn: ({
+      cardId,
+      payload,
+    }: {
+      cardId: string;
+      payload: IReviewCard;
+      deckId?: string;
+    }) => reviewCard({ cardId, payload }),
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["decks"] });
       queryClient.invalidateQueries({ queryKey: ["statistics"] });
-      // study-cards query'sini invalidate qilmaymiz - o'rganish davomida barqaror qolishi kerak
+      if (variables?.deckId) {
+        queryClient.invalidateQueries({ queryKey: ["deck", variables.deckId] });
+      }
     },
   });
 };

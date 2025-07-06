@@ -12,13 +12,15 @@ export const useAuth = (requireAuth: boolean = true) => {
   const loginModal = useLoginModal();
 
   useEffect(() => {
+    // Faqat hydration tugagandan keyin redirect qilamiz
     if (!hasHydrated) return;
-    if (requireAuth && !isAuthenticated && !loginModal.isOpen) {
+
+    if (requireAuth && !isAuthenticated) {
       loginModal.onOpen();
     } else if (!requireAuth && isAuthenticated) {
       router.push("/dashboard");
     }
-  }, [isAuthenticated, requireAuth, router, loginModal.isOpen, hasHydrated]);
+  }, [isAuthenticated, requireAuth, router, loginModal, hasHydrated]);
 
   return { isAuthenticated, hasHydrated };
 };

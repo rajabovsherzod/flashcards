@@ -15,6 +15,7 @@ export const ProtectedPage: React.FC<ProtectedPageProps> = ({
 }) => {
   const { isAuthenticated, hasHydrated } = useAuth(requireAuth);
 
+  // Hydration tugaguncha loading ko'rsatamiz
   if (!hasHydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -23,7 +24,7 @@ export const ProtectedPage: React.FC<ProtectedPageProps> = ({
     );
   }
 
-  // Show loading while redirecting
+  // Agar autentifikatsiya talab qilinayotgan bo'lsa va foydalanuvchi autentifikatsiya qilmagan bo'lsa
   if (requireAuth && !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -32,6 +33,7 @@ export const ProtectedPage: React.FC<ProtectedPageProps> = ({
     );
   }
 
+  // Agar autentifikatsiya talab qilinmayotgan bo'lsa va foydalanuvchi autentifikatsiya qilgan bo'lsa
   if (!requireAuth && isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">

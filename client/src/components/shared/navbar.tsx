@@ -17,18 +17,42 @@ const Navbar = () => {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const { onOpen } = useModal();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, hasHydrated } = useAuthStore();
   const router = useRouter();
 
   // Extract user data safely
   const fullName = user?.fullName;
   const email = user?.email;
-  
+
   useEffect(() => {
     router.prefetch("/dashboard");
     router.prefetch("/decks");
     router.prefetch("/study");
   }, [router]);
+
+  // Hydration tugaguncha navbar'ni ko'rsatmaymiz
+  if (!hasHydrated) {
+    return (
+      <div className="w-full z-50">
+        <div className="hidden lg:flex flex-row self-center items-center justify-between py-3 mx-auto px-4 relative z-[50] max-w-7xl">
+          <Link
+            className="font-normal flex gap-2 justify-center items-center text-sm text-foreground px-2 py-1 shrink-0 relative z-20"
+            href="/"
+          >
+            <span className="font-bold text-lg text-foreground">
+              FlashCard
+              <span className="ml-1 bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent">
+                Pro
+              </span>
+            </span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

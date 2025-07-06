@@ -13,6 +13,7 @@ import { Deck } from "@/lib/api/decks/deck.types";
 import { useModal } from "@/store/use-modal-store";
 import { useGetAllCardsByDeckId } from "@/hooks/use-get-all-cards-by-deck-id";
 import React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function DeckSelectionModal() {
   const { isOpen, type, onClose, onOpen } = useModal();
@@ -23,6 +24,7 @@ export function DeckSelectionModal() {
   const { data: allCardsResponse } = useGetAllCardsByDeckId(
     selectedDeckId || ""
   );
+  const queryClient = useQueryClient();
 
   const decks = decksResponse?.data || [];
   const isModalOpen = isOpen && type === "deckSelection";
@@ -55,6 +57,12 @@ export function DeckSelectionModal() {
     }
   }, [selectedDeckId, allCardsResponse, decks, onOpen, onClose]);
 
+  React.useEffect(() => {
+    if (isModalOpen) {
+      queryClient.removeQueries({ queryKey: ["study-cards"], exact: false });
+    }
+  }, [isModalOpen, queryClient]);
+
   return (
     <Dialog
       open={isModalOpen}
@@ -73,15 +81,7 @@ export function DeckSelectionModal() {
         </DialogHeader>
 
         <div className="relative flex-1 min-h-0 -mx-6 px-6 pb-6">
-          <div
-            className="h-full overflow-y-auto"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            <style jsx>{`
-              .overflow-y-auto::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
+          <div className="max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
             {isLoading && (
               <div className="flex flex-col items-center justify-center h-full">
                 <Loader2 className="w-10 h-10 animate-spin text-teal-500" />

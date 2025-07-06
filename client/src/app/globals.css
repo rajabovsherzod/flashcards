@@ -293,3 +293,22 @@ html {
     transform: rotateY(180deg);
   }
 }
+
+/* Custom professional scrollbar for deck selection modal */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #14b8a6 #23272e;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 8px;
+  background: #23272e;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #14b8a6;
+  border-radius: 8px;
+  border: 2px solid #23272e;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #0e9488;
+}
