@@ -51,6 +51,8 @@ export function CreateCardModal() {
       );
 
       queryClient.invalidateQueries({ queryKey: ["statistics"] });
+      queryClient.invalidateQueries({ queryKey: ["decks"] });
+      queryClient.invalidateQueries({ queryKey: ["cards", deckId] });
 
       handleClose();
     },
@@ -98,7 +100,12 @@ export function CreateCardModal() {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
       <DialogContent className="sm:max-w-2xl p-8">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">

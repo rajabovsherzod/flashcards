@@ -1,4 +1,3 @@
-
 export type QuizType = "FLASHCARD" | "FLASHCARD_REVERSE" | "TYPING";
 export type LearningMode = "CRAM" | "NORMAL" | "LAZY";
 
@@ -13,7 +12,7 @@ export interface Deck {
   title: string;
   quizType: QuizType;
   learningMode: LearningMode;
+  isRandomOrder: boolean;
+  cardCount: number;
   createdAt: string;
-  updatedAt: string;
-  userId: string;
 }

@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useCreateDeckModal } from "@/hooks/use-create-deck-modal";
 import { CreateDeckModal } from "@/components/decks/create-deck-modal";
 import { CreateCardModal } from "@/components/cards/create-card-modal";
+import { ProtectedPage } from "@/app/auth/protected-page";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { fullName } = useAuthStore();
@@ -34,6 +36,7 @@ export default function DashboardPage() {
     motivationalMessages[new Date().getDay() % motivationalMessages.length];
 
   return (
+    <ProtectedPage requireAuth={true}>
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Motivational Hero Section */}
@@ -133,14 +136,17 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground mb-4">
               Manage your flashcard collections
             </p>
-            <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium transition-colors">
-              Browse Decks
-            </Button>
+            <Link href="/decks">
+              <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium transition-colors">
+                Browse Decks
+              </Button>
+            </Link>
           </div>
         </section>
       </div>
       <CreateDeckModal />
       <CreateCardModal />
     </div>
+    </ProtectedPage>
   );
 }

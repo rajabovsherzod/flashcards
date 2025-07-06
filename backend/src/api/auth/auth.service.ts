@@ -10,6 +10,7 @@ import emailService from "@/services/email.service";
 import { UserDto } from "@/api/user/dto/user.dto";
 import bcrypt from "bcryptjs";
 import { tokenService } from "@/services/token.service";
+import jwt from "jsonwebtoken";
 
 class AuthService {
   public async registerStepOne(data: RegisterStepOne) {
@@ -178,6 +179,50 @@ class AuthService {
         token: refreshToken
       }
     })
+  }
+
+  public async refreshToken(refreshToken: string) {
+    const storedToken = await prisma.refreshToken.findUnique({
+      where: {
+        token: refreshToken
+      },
+      include: {
+        user: true
+      }
+    })
+
+    if(!storedToken){
+      await this.revokeAllUserTokens(refreshToken)
+      throw new ApiError(401, "Token theft detected. Please login again.");
+    }
+    if(storedToken.revoked || storedToken.expiresAt < new Date()) {
+      throw new ApiError(401, "Invalid or expired refresh token");
+    }
+
+    const newTokens = tokenService.generateAuthTokens(storedToken.user);
+    await prisma.refreshToken.delete({
+      where: {
+        token: refreshToken
+      }
+    })
+
+    await tokenService.saveRefreshToken(newTokens.refreshToken, storedToken.user.id)
+    const userDto = new UserDto(storedToken.user)
+    return { userDto, tokens: newTokens }
+  }
+
+  private async revokeAllUserTokens(suspiciousToken: string) {
+    // Bu method hacker tokenini aniqlaganda barcha user tokenlarini o'chiradi
+    try {
+      const decoded = jwt.decode(suspiciousToken) as any;
+      if (decoded?.id) {
+        await prisma.refreshToken.deleteMany({
+          where: { userId: decoded.id }
+        });
+      }
+    } catch (error) {
+      // Silent fail
+    }
   }
 }
 

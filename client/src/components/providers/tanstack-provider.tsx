@@ -8,7 +8,9 @@ interface QueryProviderProps {
   children: React.ReactNode;
 }
 
-export const QueryProvider: React.FC<QueryProviderProps> = ({ children }) => {
+export const TanstackProvider: React.FC<QueryProviderProps> = ({
+  children,
+}) => {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -16,7 +18,10 @@ export const QueryProvider: React.FC<QueryProviderProps> = ({ children }) => {
           queries: {
             staleTime: 1000 * 60 * 5, // 5 daqiqa
             refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchOnReconnect: false,
             retry: 1,
+            retryDelay: 1000,
           },
         },
       })

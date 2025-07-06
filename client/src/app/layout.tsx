@@ -5,8 +5,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/shared/footer";
 import Navbar from "@/components/shared/navbar";
-import { QueryProvider } from "@/components/providers/query-provider";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
+import { ModalProvider } from "@/components/providers/modal-provider";
+import { TanstackProvider } from "@/components/providers/tanstack-provider";
 
 // Inter'ni asosiy matn uchun, --font-inter o'zgaruvchisi bilan
 const inter = Inter({
@@ -33,24 +34,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="bg-background">
+    <html lang="en" suppressHydrationWarning>
       {/* Ikkala shrift o'zgaruvchisini ham body'ga beramiz */}
-      <body className={`${inter.variable} ${lora.variable} font-sans`}>
-        <QueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+      <body
+        className={`${inter.variable} ${lora.variable} font-sans bg-background`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TanstackProvider>
+            <Toaster richColors />
+            <ModalProvider />
             <div className="relative flex flex-col min-h-screen overflow-hidden">
               <Navbar />
               <main className="flex-grow">{children}</main>
               <Footer />
             </div>
-          </ThemeProvider>
-        </QueryProvider>
-        <Toaster />
+          </TanstackProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -2,21 +2,33 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
 import { RegisterModal } from "../../app/auth/register/register-modal";
 import { useRegisterModal } from "@/hooks/use-register-modal";
 import { LoginModal } from "../../app/auth/login/login-modal";
 import { useLoginModal } from "@/hooks/use-login-modal";
 import { useAuthStore } from "@/store/auth-store";
-import { User, ChevronDown } from "lucide-react";
+import { User, ChevronDown, Home, BookOpen, GraduationCap } from "lucide-react";
+import { useModal } from "@/store/use-modal-store";
 
 const Navbar = () => {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
-  const { isAuthenticated, fullName, email } = useAuthStore();
+  const { onOpen } = useModal();
+  const { isAuthenticated, user } = useAuthStore();
+  const router = useRouter();
 
- 
+  // Extract user data safely
+  const fullName = user?.fullName;
+  const email = user?.email;
+  
+  useEffect(() => {
+    router.prefetch("/dashboard");
+    router.prefetch("/decks");
+    router.prefetch("/study");
+  }, [router]);
 
   return (
     <>
@@ -36,6 +48,33 @@ const Navbar = () => {
               </span>
             </span>
           </Link>
+
+          {/* Navigation Links - Only show for authenticated users */}
+          {isAuthenticated && (
+            <div className="flex items-center gap-1">
+              <Link href="/dashboard">
+                <Button variant="ghost" size="sm" className="text-sm">
+                  <Home className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Link href="/decks">
+                <Button variant="ghost" size="sm" className="text-sm">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Decks
+                </Button>
+              </Link>
+              <Button
+                onClick={() => onOpen("deckSelection")}
+                variant="ghost"
+                size="sm"
+                className="text-sm"
+              >
+                <GraduationCap className="w-4 h-4 mr-2" />
+                Study
+              </Button>
+            </div>
+          )}
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
@@ -133,6 +172,43 @@ const Navbar = () => {
               )}
             </div>
           </div>
+
+          {/* Mobile Navigation Links */}
+          {isAuthenticated && (
+            <div className="w-full px-4 pb-4">
+              <div className="flex flex-col gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                <Link href="/dashboard">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-sm"
+                  >
+                    <Home className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </Button>
+                </Link>
+                <Link href="/decks">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-sm"
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Decks
+                  </Button>
+                </Link>
+                <Button
+                  onClick={() => onOpen("deckSelection")}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-sm"
+                >
+                  <GraduationCap className="w-4 h-4 mr-2" />
+                  Study
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

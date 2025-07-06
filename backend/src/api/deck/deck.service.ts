@@ -37,6 +37,9 @@ class Deckservice {
                 _count: {
                     select: { cards: true}
                 }
+            },
+            orderBy: {
+                createdAt: "asc"
             }
         })
         return decks.map(deck => new DeckDto(deck))

@@ -12,12 +12,13 @@ import { LoginForm } from "./login-form";
 export function LoginModal() {
   const { isOpen, onClose } = useLoginModal();
 
-  const handleClose = () => {
-    onClose();
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent className="sm:max-w-md p-8">
         <DialogHeader>
           <DialogTitle className="text-center text-3xl font-bold tracking-tight">

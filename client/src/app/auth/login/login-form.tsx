@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Eye, EyeOff, Loader2, LockKeyhole } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useLoginModal } from "@/hooks/use-login-modal";
 import { loginSchema } from "../validation/index";
@@ -28,7 +29,8 @@ type LoginValues = z.infer<typeof loginSchema>;
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { onClose } = useLoginModal();
-  const { setUserData } = useAuthStore();
+  const { setAuthData } = useAuthStore();
+  const queryClient = useQueryClient();
   const router = useRouter();
 
   const form = useForm<LoginValues>({
@@ -44,20 +46,15 @@ export const LoginForm = () => {
     mutationKey: ["login-mutate"],
     mutationFn: login,
     onSuccess: (data) => {
-      localStorage.setItem("accessToken", data.data.accessToken);
-      setUserData({
-        fullName: data.data.fullName,
-        email: data.data.email,
-      });
+      const { accessToken, fullName, email } = data.data;
 
-      console.log("User logged in:", {
-        fullName: data.data.fullName,
-        email: data.data.email,
-      });
+      setAuthData(accessToken, { fullName, email });
 
-      router.replace("/dashboard", { scroll: false });
+      router.replace("/decks", { scroll: false });
       toast.success("Login successful");
+
       onClose();
+      queryClient.invalidateQueries({ queryKey: ["decks"] });
     },
     onError: (error) => {
       toast.error("Login failed", { description: error.message });

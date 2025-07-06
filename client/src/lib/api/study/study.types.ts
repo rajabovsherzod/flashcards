@@ -1,3 +1,3 @@
 export interface IReviewCard {
-    knewIt: boolean;
-  }
+  knewIt: boolean;
+}

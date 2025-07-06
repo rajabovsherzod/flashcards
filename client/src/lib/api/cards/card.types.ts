@@ -4,21 +4,24 @@ export interface CardData {
   back: string;
 }
 
-export interface CreateBatchCardsPayload {
-  cards: CardData[];
-}
+export type CreateBatchCardsPayload = {
+  cards: CreateCardPayload[];
+};
 
-// This represents a full Card object as returned by the backend.
-export interface Card {
+
+export type Card = {
   id: string;
   front: string;
   back: string;
   deckId: string;
-  stage: number;
-  nextReview: string;
+  nextReviewAt: string; 
+  studyStage: number;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-// We don't need a separate BatchCardsApiResponse.
-// The generic ApiResponse<Card[]> is sufficient.
+// CreateCardPayload ham kerak bo'ladi
+export interface CreateCardPayload {
+  front: string;
+  back: string;
+}

@@ -1,62 +1,93 @@
-import { prisma } from "@/lib/prisma"
-import CardService from "../card/card.service"
-import ApiError from "@/utils/api.Error"
-import { CardDto } from "../card/card.dto"
-import { IReviewCard } from "./study.types"
-import { getIntervalForStage, calculateNextStage } from "@/utils/repetition"
+import { prisma } from "@/lib/prisma";
+import DeckService from "../deck/deck.service";
+import CardService from "../card/card.service";
+import { CardDto } from "../card/card.dto";
+import { IReviewCard } from "./study.types";
+import { getIntervalForStage, calculateNextStage } from "@/utils/repetition";
 
 class StudyService {
-    constructor(private readonly cardService: CardService){
-        this.cardService = cardService
+  constructor(
+    private readonly deckService: DeckService,
+    private readonly cardService: CardService
+  ) {}
+
+  public async getStudyCards(
+    deckId: string,
+    userId: string,
+    limit: number = 10,
+    randomOrder: boolean = false
+  ) {
+    // 1. Check ownership
+    const deck = await this.deckService.checkDeckOwnership(deckId, userId);
+
+    // 2. Fetch ALL cards for the deck
+    const allCardsInDeck = await prisma.card.findMany({
+      where: { deckId },
+    });
+
+    // 3. Filter cards in application code
+    const now = new Date();
+    const cardsReadyForReview = allCardsInDeck.filter((card) => {
+      const isDue = card.nextReviewAt <= now;
+      const isNew = card.studyStage === 0;
+      return isDue || isNew;
+    });
+
+    // 4. Shuffle if requested
+    let processedCards = [...cardsReadyForReview];
+    if (randomOrder) {
+      processedCards.sort(() => Math.random() - 0.5);
     }
 
-    public async getStudyCards(deckId: string, limit: number | undefined, userId: string){
-        const { deck } = await this.cardService.checkCardOwnership(deckId, userId)
+    // 5. Apply limit
+    const finalCards = processedCards.slice(0, limit);
 
-        const cardsToReview = await prisma.card.findMany({
-            where: {
-                deckId: deckId,
-                nextReviewAt: { lte: new Date() },
-            },
-            take: limit || 10,
-        })
+    return finalCards.map((card) => new CardDto(card));
+  }
 
-        if(deck.isRandomOrder){
-            cardsToReview.sort(() => Math.random() - 0.5)
-        }
+  public async reviewCard(
+    cardId: string,
+    data: IReviewCard,
+    userId: string
+  ) {
+    const { card, deck } = await this.cardService.checkCardOwnership(
+      cardId,
+      userId
+    );
 
-        return cardsToReview.map(card => new CardDto(card))
-    }
+    const newStudyStage = calculateNextStage(
+      card.studyStage,
+      data.knewIt,
+      deck.learningMode
+    );
+    const rawInterval = getIntervalForStage(newStudyStage, deck.learningMode);
+    const intervalInDays = Math.max(1, Math.round(rawInterval));
 
-    public async reviewCard(cardId: string, data: IReviewCard, userId: string){
-        const { card, deck } = await this.cardService.checkCardOwnership(cardId, userId)
-        let newStudyStage = calculateNextStage(card.studyStage, data.knewIt, deck.learningMode)
-        const intervalInDays = getIntervalForStage(newStudyStage, deck.learningMode)
-        const nextReviewAt = new Date()
-        nextReviewAt.setDate(nextReviewAt.getDate() + intervalInDays)
+    const now = new Date();
+    const nextReviewAt = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    );
+    nextReviewAt.setUTCDate(nextReviewAt.getUTCDate() + intervalInDays);
 
-        const [updatedCard] = await prisma.$transaction([
-            prisma.card.update({
-                where: {
-                    id: cardId
-                },
-                data: {
-                    studyStage: newStudyStage,
-                    nextReviewAt: nextReviewAt
-                }
-            }),
-            prisma.reviewLog.create({
-                data: {
-                    cardId: cardId,
-                    userId: userId,
-                    rating: data.knewIt,
-                }
-            })
-        ])
+    const [updatedCard] = await prisma.$transaction([
+      prisma.card.update({
+        where: { id: cardId },
+        data: {
+          studyStage: newStudyStage,
+          nextReviewAt,
+        },
+      }),
+      prisma.reviewLog.create({
+        data: {
+          cardId,
+          userId,
+          rating: data.knewIt,
+        },
+      }),
+    ]);
 
-        return new CardDto(updatedCard)
-    }
+    return new CardDto(updatedCard);
+  }
 }
 
-
-export default StudyService
+export default StudyService;

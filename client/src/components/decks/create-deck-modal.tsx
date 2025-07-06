@@ -4,8 +4,22 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription,DialogFooter,} from "@/components/ui/dialog";
-import {Form,FormControl,FormField,FormItem,FormLabel,FormMessage,} from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,7 +31,9 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 const quizTypes = Object.keys(QuizType) as (keyof typeof QuizType)[];
-const learningModes = Object.keys( LearningMode) as (keyof typeof LearningMode)[];
+const learningModes = Object.keys(
+  LearningMode
+) as (keyof typeof LearningMode)[];
 
 export function CreateDeckModal() {
   const { isOpen, onClose } = useCreateDeckModal();
@@ -40,6 +56,7 @@ export function CreateDeckModal() {
       toast.success("Deck created successfully");
 
       queryClient.invalidateQueries({ queryKey: ["statistics"] });
+      queryClient.invalidateQueries({ queryKey: ["decks"] });
 
       onClose();
       onOpenCreateCardModal(data.data.id);
@@ -59,7 +76,12 @@ export function CreateDeckModal() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
       <DialogContent className="sm:max-w-lg p-8">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">

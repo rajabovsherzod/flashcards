@@ -9,13 +9,12 @@ type CreateCardsInput = {
 };
 
 // The function now correctly promises a response containing an array of Card objects.
-export const createBatchCards = async ({
-  deckId,
-  payload,
-}: CreateCardsInput): Promise<ApiResponse<Card[]>> => {
-  const response = await $api.post<ApiResponse<Card[]>>(
-    `/decks/${deckId}/cards/batch`,
-    payload
-  );
+export const createBatchCards = async ({deckId,payload}: CreateCardsInput): Promise<ApiResponse<Card[]>> => {
+  const response = await $api.post<ApiResponse<Card[]>>(`/decks/${deckId}/cards/batch`,payload);
+  return response.data;
+};
+
+export const getAllCardsByDeckId = async ({ deckId }: { deckId: string }): Promise<ApiResponse<Card[]>> => {
+  const response = await $api.get<ApiResponse<Card[]>>(`/decks/${deckId}/cards`);
   return response.data;
 };

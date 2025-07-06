@@ -1,11 +1,35 @@
 import { Request, Response, NextFunction } from "express";
 import AuthService from "@/api/auth/auth.service";
 import ApiResponse from "@/utils/api.Response";
+import ApiError from "@/utils/api.Error";
 
 class AuthController {
   constructor(private readonly authService: AuthService) {
     this.authService = authService;
   }
+
+  public refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { refreshToken } = req.cookies;
+      
+      if (!refreshToken) {
+        return next(new ApiError(401, "Refresh token not provided"));
+      }
+
+      const { userDto: user, tokens } = await this.authService.refreshToken(refreshToken);
+      
+      res.cookie("refreshToken", tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 kun
+        sameSite: "strict",
+      });
+
+      res.status(200).json(new ApiResponse({ user: user, accessToken: tokens.accessToken },"Token refreshed successfully"))
+    } catch (error) {
+      next(error);
+    }
+  };
 
   public registerStepOne = async (req: Request, res: Response, next: NextFunction) => {
     try {

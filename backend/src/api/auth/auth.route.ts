@@ -15,5 +15,5 @@ router.post('/verify-email', validate(registrationStepTwoSchema), authController
 router.post('/set-password', validate(registerationStepThreeSchema), authController.registerStepThree);
 router.post('/login', validate(loginSchema), authController.login);
 router.post('/logout', authMiddleware, authController.logout);
-
+router.post('/refresh-token', authController.refreshToken);
 export default router;

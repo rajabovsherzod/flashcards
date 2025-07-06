@@ -1,7 +1,12 @@
 "use client";
 
 import { useRegisterModal } from "@/hooks/use-register-modal";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Step1Details } from "./register-steps/step-name-email";
 import { Step2Verify } from "./register-steps/step-verify-email";
 import { Step3Password } from "./register-steps/step-set-password";
@@ -17,7 +22,8 @@ export function RegisterModal() {
   const { isOpen, onClose, step } = useRegisterModal();
 
   // Joriy qadamga mos komponentni tanlaymiz
-  const CurrentStepComponent = stepComponents[step as keyof typeof stepComponents];
+  const CurrentStepComponent =
+    stepComponents[step as keyof typeof stepComponents];
 
   const handleClose = () => {
     // Modal yopilganda, holatni boshlang'ich holatiga qaytarish uchun
@@ -26,7 +32,12 @@ export function RegisterModal() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
       <DialogContent className="sm:max-w-md p-8">
         <DialogHeader>
           <DialogTitle className="text-center text-3xl font-bold tracking-tight">

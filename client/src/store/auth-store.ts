@@ -1,42 +1,53 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-interface AuthStore {
+interface UserData {
   fullName: string;
   email: string;
+}
+
+interface AuthStore {
   isAuthenticated: boolean;
-  setFullName: (name: string) => void;
-  setEmail: (email: string) => void;
-  setIsAuthenticated: (isAuthenticated: boolean) => void;
-  setUserData: (userData: { fullName: string; email: string }) => void;
+  accessToken: string | null;
+  user: UserData | null;
+  hasHydrated: boolean;
+  setAuthData: (token: string, userData: UserData) => void;
+  setAccessToken: (token: string) => void;
   reset: () => void;
+  setHasHydrated: (hydrated: boolean) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
-      fullName: "",
-      email: "",
       isAuthenticated: false,
-      setFullName: (name) => set({ fullName: name }),
-      setEmail: (email) => set({ email: email }),
-      setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-      setUserData: (userData) =>
+      accessToken: null,
+      user: null,
+      hasHydrated: false,
+      setAuthData: (token, userData) =>
         set({
-          fullName: userData.fullName,
-          email: userData.email,
           isAuthenticated: true,
+          accessToken: token,
+          user: userData,
         }),
-      reset: () => set({ fullName: "", email: "", isAuthenticated: false }),
+      setAccessToken: (token) =>
+        set({
+          accessToken: token,
+        }),
+      reset: () =>
+        set({
+          isAuthenticated: false,
+          accessToken: null,
+          user: null,
+        }),
+      setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
     }),
     {
-      name: "auth-storage", // localStorage key
-      storage: createJSONStorage(() => localStorage), // localStorage'da saqlash
-      partialize: (state) => ({
-        fullName: state.fullName,
-        email: state.email,
-        isAuthenticated: state.isAuthenticated,
-      }), 
+      name: "auth-storage",
+      storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

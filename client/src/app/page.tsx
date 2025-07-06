@@ -1,10 +1,12 @@
 import HeroSection from "@/components/shared/hero-section";
+import { ProtectedPage } from "@/app/auth/protected-page";
 
 export default function LandingPage() {
   return (
-    <main>
-      <HeroSection />
-      {/* Kelajakda bu yerga FeaturesSection va boshqa qismlarni qo'shamiz */}
-    </main>
+    <ProtectedPage requireAuth={false}>
+      <main>
+        <HeroSection />
+      </main>
+    </ProtectedPage>
   );
 }

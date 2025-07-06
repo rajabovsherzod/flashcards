@@ -7,6 +7,7 @@ import statisticsRoute from "@/api/statistics/statistics.route";
 
 const router = Router();
 
+// Asosiy marshrutlar
 router.use("/auth", authRoute);
 router.use("/users", userRoute);
 router.use("/decks", deckRoute);
